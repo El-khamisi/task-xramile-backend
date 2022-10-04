@@ -1,0 +1,14 @@
+env:
+  commonjs: true
+  es2021: true
+  node: true
+extends: standard
+overrides: []
+parserOptions:
+  ecmaVersion: latest
+# files: ["src/**/*.js"]
+ignorePatterns: [".node_modules/*"]
+rules: {
+  semi: ["error", "always"],
+  comma-dangle: ["error", "only-multiline"]
+}
