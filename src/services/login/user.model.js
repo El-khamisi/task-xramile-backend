@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const validator = require('validator');
 
 // configuration
-const { TOKENKEY } = require('../../config/env');
+const { TOKENWORD } = require('../../config/env');
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, trim: true, required: [true, 'name is required'] },
@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
     phone: {
       type: String,
       validate: {
-        validate: (v) => validator.isMobilePhone(v, 'any', { strictMode: true }),
+        validator: (v) => validator.isMobilePhone(v, 'any', { strictMode: true }),
         message: 'Invalid phone number',
       },
     },
@@ -41,12 +41,12 @@ userSchema.virtual('posts', {
 userSchema.methods.generateToken = function () {
   const token = jwt.sign(
     {
-      id: this._id,
+      _id: this._id,
       name: this.name,
       email: this.email,
       phone: this.phone,
     },
-    TOKENKEY,
+    TOKENWORD,
     { expiresIn: '14d' }
   );
 

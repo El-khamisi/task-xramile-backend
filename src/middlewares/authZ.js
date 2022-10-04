@@ -1,4 +1,4 @@
-const Post = require('../services/login/posts/posts.model');
+const Post = require('../services/posts/posts.model');
 const { failedRes } = require('../utils/response');
 
 exports.canUpdate = async (req, res, next) => {

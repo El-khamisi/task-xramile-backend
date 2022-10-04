@@ -6,22 +6,22 @@ const session = require('express-session');
 const Redis = require('ioredis');
 const RedisStore = require('connect-redis')(session);
 const morgan = require('morgan');
-const { TOKENKEY, DBURI, DBURI_REMOTE, NODE_ENV, REDIS_URL } = require('./config/env');
+const { TOKENWORD, DBURI, DBURI_REMOTE, NODE_ENV, REDIS_URL } = require('./config/env');
 
 const login = require('./services/login/login.routes');
 const post = require('./services/posts/posts.routes');
 
-module.exports = async (app) => {
+module.exports = (app) => {
   app.use(cookieParser());
   app.use(express.json());
   app.use(morgan('dev'));
 
   // Configure redis client
   const redisClient = new Redis(REDIS_URL);
+  redisClient.on('connect', () => console.log('Connected to redis successfully'));
   redisClient.on('error', (err) =>
     console.log('Could not establish a connection with redis. ' + err)
   );
-  redisClient.on('connect', () => console.log('Connected to redis successfully'));
 
   if (NODE_ENV === 'dev') {
     mongoose
@@ -58,7 +58,7 @@ module.exports = async (app) => {
   app.use(
     session({
       name: 's_id',
-      secret: TOKENKEY,
+      secret: TOKENWORD,
       store: new RedisStore({ client: redisClient }),
       resave: false,
       saveUninitialized: false,

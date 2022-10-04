@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { TOKENKEY } = require('../config/env');
+const { TOKENWORD } = require('../config/env');
 const User = require('../services/login/user.model');
 const { failedRes } = require('../utils/response');
 
@@ -12,13 +12,13 @@ exports.authN = (req, res, next) => {
     ? req.get('Authorization').split(' ')[1]
     : req.cookies.authorization;
 
-  jwt.verify(token, TOKENKEY, (err, decoded) => {
+  jwt.verify(token, TOKENWORD, (err, decoded) => {
     if (err) return failedRes(res, 401, err);
 
     // Add the session if doesn't exist
     const user = req.session.user;
-    if (!user || !req.cookies.s_id) {
-      User.findById(decoded.id)
+    if (!user || !req.cookies.s_id || decoded._id.toString() !== user._id.toString()) {
+      User.findById(decoded._id)
         .then((user) => {
           user.password = undefined;
           req.session.user = user.toObject();

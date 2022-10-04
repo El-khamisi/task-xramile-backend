@@ -51,9 +51,11 @@ exports.addPost = async (req, res) => {
       content,
     });
     await post.save();
-
+    
     return successfulRes(res, 201, post);
   } catch (err) {
+    if(err instanceof mongoose.Error.ValidationError)
+      return failedRes(res, 422, err);
     return failedRes(res, 500, err);
   }
 };
@@ -72,6 +74,8 @@ exports.updatePost = async (req, res) => {
 
     return successfulRes(res, 200, post);
   } catch (e) {
+    if(err instanceof mongoose.Error.ValidationError)
+      return failedRes(res, 422, err);
     return failedRes(res, 500, e);
   }
 };

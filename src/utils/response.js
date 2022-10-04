@@ -12,9 +12,6 @@ const failedRes = (res, status, error = null, msg = 'error') => {
     msg,
     data: error?.message,
   });
-  if (status === 500) {
-    process.exit(1);
-  }
 };
 
 module.exports = {

@@ -2,6 +2,7 @@ const User = require('./user.model');
 const bcrypt = require('bcrypt');
 const { successfulRes, failedRes } = require('../../utils/response');
 const { NODE_ENV } = require('../../config/env');
+const { default: mongoose } = require('mongoose');
 
 exports.regUser = async (req, res) => {
   let { name, email, password, phone } = req.body;
@@ -12,7 +13,7 @@ exports.regUser = async (req, res) => {
 
   try {
     const prev = await User.findOne({ email }).exec();
-    if (prev) return failedRes(res, 400, new Error('You already have an account'));
+    if (prev) return failedRes(res, 400, new Error('You already have an account try to login'));
 
     password = bcrypt.hashSync(password, 10);
 
@@ -24,13 +25,15 @@ exports.regUser = async (req, res) => {
     req.session.user = saved.toObject();
 
     return successfulRes(res, 201, {
-      id: saved._id,
+      _id: saved._id,
       name: saved.name,
       email: saved.email,
       phone: saved.phone,
       token,
     });
   } catch (err) {
+    if(err instanceof mongoose.Error.ValidationError)
+      return failedRes(res, 422, err);
     return failedRes(res, 500, err);
   }
 };
@@ -45,13 +48,13 @@ exports.logUser = async (req, res) => {
   try {
     const logged = await User.findOne({ email }).exec();
     if (!logged) {
-      return failedRes(res, 400, new Error('You do NOT have account please sign up and try again'));
+      return failedRes(res, 401, new Error('You do NOT have account please sign up and try again'));
     }
 
     const matched = bcrypt.compareSync(password, logged.password);
 
     if (!matched) {
-      return failedRes(res, 400, new Error('Email or Password is invalid'));
+      return failedRes(res, 401, new Error('Email or Password is invalid'));
     }
 
     const token = logged.generateToken();
@@ -59,7 +62,7 @@ exports.logUser = async (req, res) => {
     req.session.user = logged.toObject();
 
     return successfulRes(res, 200, {
-      id: logged._id,
+      _id: logged._id,
       name: logged.name,
       email: logged.email,
       phone: logged.phone,
@@ -100,6 +103,8 @@ exports.resetPassword = async (req, res) => {
     await user.save();
     return successfulRes(res, 200, 'Password has been changed successfully');
   } catch (err) {
+    if(err instanceof mongoose.Error.ValidationError)
+      return failedRes(res, 422, err);
     return failedRes(res, 500, err);
   }
 };
