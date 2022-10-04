@@ -20,6 +20,7 @@ exports.authN = (req, res, next) => {
     if (!user || !req.cookies.s_id || decoded._id.toString() !== user._id.toString()) {
       User.findById(decoded._id)
         .then((user) => {
+          if (!user) return failedRes(res, 400, new Error('please provide a brand new jwt token'));
           user.password = undefined;
           req.session.user = user.toObject();
           next();

@@ -20,3 +20,5 @@ if (NODE_ENV === 'dev') {
     console.log(`Production connected successfully ON port-${port}`);
   });
 }
+
+module.exports = app;

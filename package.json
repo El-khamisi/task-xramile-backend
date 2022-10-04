@@ -6,10 +6,10 @@
   "scripts": {
     "prettier": "prettier --config .prettierrc.yaml './**/*.js'  --write",
     "eslint": "eslint -c .eslintrc.yml .",
-    "dev": "nodemon index.js 5050",
+    "dev": "NODE_ENV=dev nodemon index.js 5050",
     "prod": "NODE_ENV=prod node index.js",
     "start": "NODE_ENV=prod node index.js",
-    "jasmine": "npx jasmine"
+    "test": "NODE_ENV=test jasmine"
   },
   "author": "",
   "license": "ISC",
@@ -34,6 +34,9 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.3.0",
     "eslint-plugin-promise": "^6.0.1",
-    "prettier": "^2.7.1"
+    "jasmine": "^4.4.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "prettier": "^2.7.1",
+    "supertest": "^6.3.0"
   }
 }

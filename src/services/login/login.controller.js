@@ -32,8 +32,7 @@ exports.regUser = async (req, res) => {
       token,
     });
   } catch (err) {
-    if(err instanceof mongoose.Error.ValidationError)
-      return failedRes(res, 422, err);
+    if (err instanceof mongoose.Error.ValidationError) return failedRes(res, 422, err);
     return failedRes(res, 500, err);
   }
 };
@@ -77,8 +76,8 @@ exports.logout = async (req, res) => {
   req.session.destroy(() => {});
 
   res.cookie('s_id', '', {
-    sameSite: NODE_ENV === 'dev' ? false : 'none',
-    secure: !(NODE_ENV === 'dev'),
+    sameSite: NODE_ENV === 'prod' ? 'none' : '',
+    secure: NODE_ENV === 'prod',
   });
 
   return successfulRes(res, 200, 'You have been logged out successfully');
@@ -103,8 +102,7 @@ exports.resetPassword = async (req, res) => {
     await user.save();
     return successfulRes(res, 200, 'Password has been changed successfully');
   } catch (err) {
-    if(err instanceof mongoose.Error.ValidationError)
-      return failedRes(res, 422, err);
+    if (err instanceof mongoose.Error.ValidationError) return failedRes(res, 422, err);
     return failedRes(res, 500, err);
   }
 };

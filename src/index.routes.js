@@ -6,7 +6,7 @@ const session = require('express-session');
 const Redis = require('ioredis');
 const RedisStore = require('connect-redis')(session);
 const morgan = require('morgan');
-const { TOKENWORD, DBURI, DBURI_REMOTE, NODE_ENV, REDIS_URL } = require('./config/env');
+const { TOKENWORD, DBURI, DBURI_REMOTE, NODE_ENV, REDIS_URL, DBURI_TEST } = require('./config/env');
 
 const login = require('./services/login/login.routes');
 const post = require('./services/posts/posts.routes');
@@ -14,7 +14,6 @@ const post = require('./services/posts/posts.routes');
 module.exports = (app) => {
   app.use(cookieParser());
   app.use(express.json());
-  app.use(morgan('dev'));
 
   // Configure redis client
   const redisClient = new Redis(REDIS_URL);
@@ -24,6 +23,7 @@ module.exports = (app) => {
   );
 
   if (NODE_ENV === 'dev') {
+    app.use(morgan('dev'));
     mongoose
       .connect(DBURI)
       .then(() => {
@@ -32,7 +32,17 @@ module.exports = (app) => {
       .catch(() => {
         console.log("can't connect to local database");
       });
+  } else if (NODE_ENV === 'test') {
+    mongoose
+      .connect(DBURI_TEST)
+      .then(() => {
+        console.log('connected to test database successfully');
+      })
+      .catch(() => {
+        console.log("can't connect to test database");
+      });
   } else {
+    app.use(morgan('common'));
     mongoose
       .connect(DBURI_REMOTE)
       .then(() => {
@@ -64,8 +74,8 @@ module.exports = (app) => {
       saveUninitialized: false,
       cookie: {
         maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days OR TWO WEEKS
-        sameSite: NODE_ENV === 'dev' ? '' : 'none',
-        secure: !(NODE_ENV === 'dev'),
+        sameSite: NODE_ENV === 'prod' ? 'none' : '',
+        secure: NODE_ENV === 'prod',
       },
     })
   );

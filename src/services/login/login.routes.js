@@ -4,7 +4,7 @@ const { authN } = require('../../middlewares/authN');
 
 router.post('/signup', regUser);
 router.post('/login', logUser);
-router.post('/logout', logout);
+router.post('/logout', authN, logout);
 router.put('/reset-password', authN, resetPassword);
 
 module.exports = router;

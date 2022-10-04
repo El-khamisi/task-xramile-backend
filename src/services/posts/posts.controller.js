@@ -1,3 +1,5 @@
+const validator = require('validator');
+const mongoose = require('mongoose');
 const Post = require('./posts.model');
 const { successfulRes, failedRes } = require('../../utils/response');
 
@@ -6,7 +8,7 @@ exports.getPosts = async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    const posts = await Post.aggregate([
+    let posts = await Post.aggregate([
       {
         $match: { isDeleted: false },
       },
@@ -20,6 +22,8 @@ exports.getPosts = async (req, res) => {
         },
       },
     ]);
+    posts = posts[0];
+    posts.page_info = posts.page_info[0];
     return successfulRes(res, 200, posts);
   } catch (err) {
     return failedRes(res, 500, err);
@@ -28,6 +32,10 @@ exports.getPosts = async (req, res) => {
 
 exports.getPost = async (req, res) => {
   const postId = req.params.post_id;
+  if (!validator.isMongoId(postId)) {
+    return failedRes(res, 400, new Error('Provide valid mongoose.ObjectId'));
+  }
+
   try {
     const post = await Post.findById(postId).exec();
     if (!post || post.isDeleted) {
@@ -51,11 +59,10 @@ exports.addPost = async (req, res) => {
       content,
     });
     await post.save();
-    
+
     return successfulRes(res, 201, post);
   } catch (err) {
-    if(err instanceof mongoose.Error.ValidationError)
-      return failedRes(res, 422, err);
+    if (err instanceof mongoose.Error.ValidationError) return failedRes(res, 422, err);
     return failedRes(res, 500, err);
   }
 };
@@ -73,10 +80,9 @@ exports.updatePost = async (req, res) => {
     ).exec();
 
     return successfulRes(res, 200, post);
-  } catch (e) {
-    if(err instanceof mongoose.Error.ValidationError)
-      return failedRes(res, 422, err);
-    return failedRes(res, 500, e);
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) return failedRes(res, 422, err);
+    return failedRes(res, 500, err);
   }
 };
 
