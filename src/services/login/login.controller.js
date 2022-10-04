@@ -4,15 +4,16 @@ const { successfulRes, failedRes } = require('../../utils/response');
 const { NODE_ENV } = require('../../config/env');
 
 exports.regUser = async (req, res) => {
-  try {
-    let { name, email, password, phone } = req.body;
+  let { name, email, password, phone } = req.body;
 
+  if (!(email && password)) {
+    return failedRes(res, 400, new Error('Email and password are REQUIRED'));
+  }
+
+  try {
     const prev = await User.findOne({ email }).exec();
     if (prev) return failedRes(res, 400, new Error('You already have an account'));
 
-    if (!(email && password)) {
-      return failedRes(res, 400, new Error('Email and password are REQUIRED'));
-    }
     password = bcrypt.hashSync(password, 10);
 
     const saved = new User({ name, email, password, phone });
@@ -70,23 +71,20 @@ exports.logUser = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-  try {
-    req.session.destroy(() => {});
+  req.session.destroy(() => {});
 
-    res.cookie('s_id', '', {
-      sameSite: NODE_ENV === 'dev' ? false : 'none',
-      secure: !(NODE_ENV === 'dev'),
-    });
+  res.cookie('s_id', '', {
+    sameSite: NODE_ENV === 'dev' ? false : 'none',
+    secure: !(NODE_ENV === 'dev'),
+  });
 
-    return successfulRes(res, 200, 'You have been logged out successfully');
-  } catch (err) {
-    return failedRes(res, 500, err);
-  }
+  return successfulRes(res, 200, 'You have been logged out successfully');
 };
 
 exports.resetPassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const userId = req.session.user._id;
+
   try {
     const user = await User.findById(userId).exec();
     if (!user) {
