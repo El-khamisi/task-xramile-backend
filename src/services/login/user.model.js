@@ -27,10 +27,16 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    is_deleted: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+userSchema.virtual('posts', {
+  ref: 'Post',
+  localField: '_id',
+  foreignField: 'ownerId',
+});
 
 userSchema.methods.generateToken = function () {
   const token = jwt.sign(
@@ -61,4 +67,4 @@ userSchema.post(['save', 'find', 'findByIdAndUpdate', 'findByIdAndDelete'], func
   next();
 });
 
-module.exports = mongoose.model('User', userSchema, 'users');
+module.exports = mongoose.model('User', userSchema, 'User');
