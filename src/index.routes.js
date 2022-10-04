@@ -9,10 +9,7 @@ const morgan = require('morgan');
 const { TOKENKEY, DBURI, DBURI_REMOTE, NODE_ENV, REDIS_URL } = require('./config/env');
 
 const login = require('./services/login/login.routes');
-const user = require('./services/user/users.routes');
-
-// Utilities Routes
-const { failedRes } = require('./utils/response');
+const post = require('./services/posts/posts.routes');
 
 module.exports = async (app) => {
   app.use(cookieParser());
@@ -21,7 +18,6 @@ module.exports = async (app) => {
 
   // Configure redis client
   const redisClient = new Redis(REDIS_URL);
-
   redisClient.on('error', (err) =>
     console.log('Could not establish a connection with redis. ' + err)
   );
@@ -40,10 +36,10 @@ module.exports = async (app) => {
     mongoose
       .connect(DBURI_REMOTE)
       .then(() => {
-        console.log('connected to database successfully');
+        console.log('connected to production database successfully');
       })
       .catch(() => {
-        console.log("can't connect to remote database");
+        console.log("can't connect to production database");
       });
   }
 
@@ -76,11 +72,9 @@ module.exports = async (app) => {
 
   // Routers
   app.use(login);
-  app.use(user);
+  app.use(post);
 
-  // Error handling
-  app.use((err, req, res, next) => failedRes(res, 500, err));
-
+  // Caught uncaughtExceptions
   process.on('uncaughtException', (error) => {
     console.error(error);
     process.exit(1);

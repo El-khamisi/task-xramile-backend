@@ -7,8 +7,8 @@
     "prettier": "prettier --config .prettierrc.yaml './**/*.js'  --write",
     "eslint": "eslint -c .eslintrc.yml .",
     "dev": "nodemon index.js 5050",
-    "prod": "NODE_ENV=prod node index.js 8080",
-    "start": "NODE_ENV=prod node index.js 3030",
+    "prod": "NODE_ENV=prod node index.js",
+    "start": "NODE_ENV=prod node index.js",
     "jasmine": "npx jasmine"
   },
   "author": "",
@@ -20,6 +20,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.1",
     "express-session": "^1.17.3",
+    "ioredis": "^5.2.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.6.4",
     "morgan": "^1.10.0",

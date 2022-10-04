@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
-const { authN } = require('../../../middlewares/authN');
-const { canUpdate } = require('../../../middlewares/authZ');
+const { authN } = require('../../middlewares/authN');
+const { canUpdate } = require('../../middlewares/authZ');
 const { getPosts, getPost, addPost, updatePost, deletePost } = require('./posts.controller');
 
 // Public Routes

@@ -1,5 +1,5 @@
 const Post = require('./posts.model');
-const { successfulRes, failedRes } = require('../../../utils/response');
+const { successfulRes, failedRes } = require('../../utils/response');
 
 exports.getPosts = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
