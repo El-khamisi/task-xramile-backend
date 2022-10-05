@@ -39,7 +39,7 @@ exports.getPost = async (req, res) => {
   try {
     const post = await Post.findById(postId).exec();
     if (!post || post.isDeleted) {
-      return failedRes(res, 404, new Error(`Post[${post.title}] NOT found OR has been deleted`));
+      return failedRes(res, 404, new Error(`Post[${postId}] NOT found OR has been deleted`));
     }
 
     return successfulRes(res, 200, post);
