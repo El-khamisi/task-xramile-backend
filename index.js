@@ -12,8 +12,9 @@ const endpoints = require('./src/index.routes');
 endpoints(app);
 
 if (NODE_ENV === 'dev') {
-  app.listen(process.argv[2], () => {
-    console.log(`Development connected successfully ON PORT-${process.argv[2]}`);
+  let devPort = process.argv[2] || 8080; 
+  app.listen(devPort, () => {
+    console.log(`Development connected successfully ON PORT-${devPort}`);
   });
 } else {
   app.listen(port, () => {
